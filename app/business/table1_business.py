@@ -180,7 +180,21 @@ class DatabaseService:
                     print(f"Record with ID {record_id} not found.")
                     return None
 
-
+    def delete_vector_record(self, record_id):
+        """
+        Delete a record from the vector_table.
+        """
+        query = 'DELETE FROM public."vector_table" WHERE id = %s RETURNING id;'
+        with self._get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (record_id,))
+                deleted_id = cursor.fetchone()
+                if deleted_id:
+                    print(f"Record with ID {record_id} deleted successfully from vector_table.")
+                    return deleted_id
+                else:
+                    print(f"Record with ID {record_id} not found in vector_table.")
+                    return None
 
 
 
@@ -228,6 +242,13 @@ if __name__ == "__main__":
     #         age=20,
     #     )
 
-    # read all records
+    # Delete records from vector_table
+    record_id = 2
+    deleted_id = service.delete_vector_record(record_id)
+
+    if deleted_id:
+        print(f"Record with ID {deleted_id['id']} was deleted successfully.")
+    else:
+        print(f"Record with ID {record_id} not found in vector_table.")
 
 
